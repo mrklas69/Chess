@@ -20,8 +20,7 @@ svg = chess.svg.board(
         "square light": "#ffffff",
         "square dark": "#ffffff",
         "margin": "#ffffff",
-        "coord": "#ff00ff"},
-        borders=False
+        "coord": "#ff00ff"}
 )
 
 # Šrafování: souvislé diagonální čáry
@@ -33,8 +32,19 @@ hatching_pattern = '''
 </pattern>
 '''
 
-# Vložit pattern za první <defs> tag
-svg = svg.replace('<defs>', '<defs>' + hatching_pattern, 1)
+# CSS styly pro font souřadnic - typewriter styl
+typewriter_style = '''
+<style>
+  text {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+  }
+</style>
+'''
+
+# Vložit pattern a styly za první <defs> tag
+svg = svg.replace('<defs>', '<defs>' + hatching_pattern + typewriter_style, 1)
 
 # Nahradit fill u všech tmavých polí
 svg = re.sub(
