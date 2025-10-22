@@ -58,13 +58,13 @@ files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 coordinates_svg = ''
 for i, letter in enumerate(files):
     x = 15 + i * 45 + 22.5  # margin + střed pole
-    y = 380  # pod šachovnicí, ale viditelně
+    y = 386 # pod šachovnicí, ale viditelně
     coordinates_svg += f'<text x="{x}" y="{y}" text-anchor="middle" class="coordinates">{letter}</text>\n'
 
 # Čísla 1-8 na levém okraji (x pozice vlevo od šachovnice)
 for i in range(8):
     number = str(i + 1)
-    x = 5  # více vlevo od šachovnice
+    x = 7  # více vlevo od šachovnice
     y = 15 + 360 - i * 45 - 22.5 + 5  # margin + výška - offset + vertikální zarovnání
     coordinates_svg += f'<text x="{x}" y="{y}" text-anchor="middle" class="coordinates">{number}</text>\n'
 
