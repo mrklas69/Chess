@@ -38,7 +38,7 @@ typewriter_style = '''
   .coordinates {
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
     fill: #000000;
   }
 </style>
