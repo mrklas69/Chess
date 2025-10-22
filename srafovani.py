@@ -11,16 +11,14 @@ board.push_san("Nc6")
 board.push_san("Bb5")
 board.push_san("a6")
 
-# Základní styl s bílými poli
+# Základní styl s bílými poli (souřadnice vypnuty, přidáme vlastní)
 svg = chess.svg.board(
     board,
     size=400,
-    coordinates=True,
+    coordinates=False,
     colors={
         "square light": "#ffffff",
-        "square dark": "#ffffff",
-        "margin": "#ffffff",
-        "coord": "#ff00ff"}
+        "square dark": "#ffffff"}
 )
 
 # Šrafování: souvislé diagonální čáry
@@ -35,16 +33,36 @@ hatching_pattern = '''
 # CSS styly pro font souřadnic - typewriter styl
 typewriter_style = '''
 <style>
-  text {
-    font-family: 'Courier New', Courier, monospace !important;
+  .coordinates {
+    font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    fill: #000000;
   }
 </style>
 '''
 
 # Vložit pattern a styly za první <defs> tag
 svg = svg.replace('<defs>', '<defs>' + hatching_pattern + typewriter_style, 1)
+
+# Přidat vlastní text souřadnice s typewriter fontem
+# Písmena a-h na dolním okraji
+files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+coordinates_svg = ''
+for i, letter in enumerate(files):
+    x = 15 + i * 45 + 22.5  # střed pole
+    y = 375  # pod šachovnicí
+    coordinates_svg += f'<text x="{x}" y="{y}" text-anchor="middle" class="coordinates">{letter}</text>\n'
+
+# Čísla 1-8 na levém okraji
+for i in range(8):
+    number = str(i + 1)
+    x = 7  # vlevo od šachovnice
+    y = 360 - i * 45 - 22.5 + 4  # střed pole (+4 pro vertikální zarovnání)
+    coordinates_svg += f'<text x="{x}" y="{y}" text-anchor="middle" class="coordinates">{number}</text>\n'
+
+# Vložit souřadnice před konec SVG
+svg = svg.replace('</svg>', coordinates_svg + '</svg>')
 
 # Nahradit fill u všech tmavých polí
 svg = re.sub(
