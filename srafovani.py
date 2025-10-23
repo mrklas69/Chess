@@ -36,8 +36,8 @@ hatching_pattern = '''
 typewriter_style = '''
 <style>
   .coordinates {
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
+    font-family: 'Source Code Pro', Courier, monospace;
+    font-weight: normal;
     font-size: 16px;
     fill: #000000;
   }
