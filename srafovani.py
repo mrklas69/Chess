@@ -1,6 +1,27 @@
 import chess
 import chess.svg
 import re
+import os
+import base64
+
+# Funkce pro načtení PNG obrázku a převod na data URI
+def load_piece_image(piece_path):
+    with open(piece_path, 'rb') as f:
+        image_data = base64.b64encode(f.read()).decode('utf-8')
+    return f'data:image/png;base64,{image_data}'
+
+# Načíst všechny figurky z adresáře uscf
+piece_dir = 'uscf'
+piece_images = {}
+piece_mapping = {
+    'P': 'wP.png', 'N': 'wN.png', 'B': 'wB.png', 'R': 'wR.png', 'Q': 'wQ.png', 'K': 'wK.png',
+    'p': 'bP.png', 'n': 'bN.png', 'b': 'bB.png', 'r': 'bR.png', 'q': 'bQ.png', 'k': 'bK.png'
+}
+
+for piece_symbol, filename in piece_mapping.items():
+    piece_path = os.path.join(piece_dir, filename)
+    if os.path.exists(piece_path):
+        piece_images[piece_symbol] = load_piece_image(piece_path)
 
 # Vytvořit pozici
 board = chess.Board()
@@ -19,16 +40,28 @@ svg = chess.svg.board(
     colors={
         "square light": "#ffffff",
         "square dark": "#ffffff",
-        "margin": "#ffffff",
+        "margin": "#727FA2",
         "coord": "#000000"}
 )
 
+chess24_board_theme = ['#9E7863', '#633526'];
+metro_board_theme = ['#EFEFEF', '#FFFFFF'];
+leipzig_board_theme = ['#FFFFFF', '#E1E1E1'];
+wikipedia_board_theme = ['#D18B47', '#FFCE9E'];
+dilena_board_theme = ['#FFE5B6', '#B16228'];
+uscf_board_theme = ['#C3C6BE', '#727FA2'];
+symbol_board_theme = ['#FFFFFF', '#58AC8A'];
+
 # Šrafování: souvislé diagonální čáry
-# Pro plynulé navázání přidáme více čar do patternu
-hatching_pattern = '''
-<pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="3.46" height="3.46">
-  <rect width="3.46" height="3.46" fill="#ffffff"/>
-  <path d="M-1,1 l2,-2 M0,3.46 l3.46,-3.46 M2.46,4.46 l2,-2" style="stroke:#000000; stroke-width:0.5" />
+# Přesně 13 čar na políčko (jako v LaTeXu skak)
+# Experimentálně zjištěno: pro 13 čar potřebujeme pattern_size ≈ 6.75
+import math
+# Původní výpočet dal 18 čar, chceme 13, takže: 4.9 * (18/13) ≈ 6.78
+pattern_size = (45 * math.sqrt(2)) / 13 * (18 / 13)  # ≈ 6.78 px pro přesně 13 čar
+hatching_pattern = f'''
+<pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="{pattern_size}" height="{pattern_size}">
+  <rect width="{pattern_size}" height="{pattern_size}" fill="#ffffff"/>
+  <path d="M-1,1 l2,-2 M0,{pattern_size} l{pattern_size},-{pattern_size} M{pattern_size-1},{pattern_size+1} l2,-2" style="stroke:#727FA2; stroke-width:0.8" />
 </pattern>
 '''
 
@@ -78,8 +111,37 @@ svg = re.sub(
     svg
 )
 
+# Nahradit vektorové figurky PNG obrázky
+def replace_pieces_with_images(svg_content, piece_images):
+    # Odstranit všechny <use> elementy, které odkazují na figurky
+    # chess.svg používá <use href="#white-pawn"> nebo <use xlink:href="#black-king"> atd.
+    svg_content = re.sub(r'<use[^>]*href="#[^"]*"[^>]*transform="translate\([^)]*\)"[^/]*/>', '', svg_content)
+    svg_content = re.sub(r'<use[^>]*transform="translate\([^)]*\)"[^>]*href="#[^"]*"[^/]*/>', '', svg_content)
+
+    # Přidat nové <image> elementy pro figurky před </svg>
+    pieces_svg = ''
+    for square in chess.SQUARES:
+        piece = board.piece_at(square)
+        if piece:
+            file_idx = chess.square_file(square)
+            rank_idx = chess.square_rank(square)
+            x = 15 + file_idx * 45
+            y = 15 + (7 - rank_idx) * 45
+            piece_symbol = piece.symbol()
+
+            if piece_symbol in piece_images:
+                pieces_svg += f'<image x="{x}" y="{y}" width="45" height="45" href="{piece_images[piece_symbol]}" />\n'
+
+    svg_content = svg_content.replace('</svg>', pieces_svg + '</svg>')
+    return svg_content
+
+svg = replace_pieces_with_images(svg, piece_images)
+
 # Uložit
 with open("srafovani.svg", "w", encoding="utf-8") as f:
     f.write(svg)
 
-print("SVG s LaTeX-ovým šrafováním vytvořeno!")
+print("SVG s LaTeX-ovým šrafováním a PNG figurkami z adresáře uscf vytvořeno!")
+
+# Otevřít SVG soubor (ve výchozím programu nebo VS Code, pokud je asociován)
+os.startfile("srafovani.svg")
