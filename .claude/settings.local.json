@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python srafovani.py:*)",
+      "Bash(start srafovani.svg)",
+      "Bash(python:*)",
+      "Bash(dir:*)",
+      "Bash(del:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
