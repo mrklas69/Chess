@@ -54,6 +54,33 @@ cd 03_leipzig
 python 03_leipzig.py
 ```
 
+### 4. Chessboard Image modul ([04_chessboard_image/generate_image.py](04_chessboard_image/generate_image.py))
+Využití specializované knihovny **chessboard_image** pro generování PNG obrázků šachovnic s různými barevnými tématy.
+
+**Vlastnosti:**
+- Generování PNG formátu (místo SVG)
+- 5 různých barevných témat (alpha, wikipedia, uscf, wisteria, sakura)
+- Zobrazení souřadnic (a-h, 1-8)
+- Konfigurovatelná velikost (400×400px)
+- Výstupy: `sicilian_defense_*.png` (pro každé téma)
+
+**Šachová pozice:**
+Sicilská obrana po 2 tazích:
+```
+1. e4 c5
+```
+
+**Spuštění:**
+```bash
+cd 04_chessboard_image
+python generate_image.py
+```
+
+**Požadavky:**
+```bash
+pip install chessboard_image
+```
+
 ## Kořenový skript ([srafovani.py](srafovani.py))
 Původní experimentální skript s plnou konfigurací šrafování a různými barevnými tématy.
 
