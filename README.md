@@ -81,30 +81,6 @@ python generate_image.py
 pip install chessboard_image
 ```
 
-## Kořenový skript ([srafovani.py](srafovani.py))
-Původní experimentální skript s plnou konfigurací šrafování a různými barevnými tématy.
-
-**Vlastnosti:**
-- Šrafování tmavých polí s přesným výpočtem hustoty čar
-- PNG figurky USCF (z adresáře `uscf/`)
-- Konfigurovatelné barevné téma (chess24, metro, leipzig, wikipedia, dilena, uscf, symbol)
-- Typewriter font pro souřadnice
-- Margin v barvě #727FA2
-- Výstup: `srafovani.svg`
-
-**Spuštění:**
-```bash
-python srafovani.py
-```
-
-## Šachová pozice
-Všechny skripty generují stejnou pozici - **Španělská partie (Ruy Lopez)** po 6 tazích:
-```
-1. e4 e5
-2. Nf3 Nc6
-3. Bb5 a6
-```
-
 ## Požadavky
 ```bash
 pip install python-chess
