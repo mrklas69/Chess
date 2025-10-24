@@ -5,7 +5,7 @@ import os
 import base64
 
 # Výstupní soubor
-OUTPUT_FILE = "03_leipzig.svg"
+OUTPUT_FILE = "leipzig.svg"
 
 # Vytvořit pozici
 board = chess.Board()

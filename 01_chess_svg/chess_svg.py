@@ -3,7 +3,7 @@ import chess.svg
 import os
 
 # Výstupní soubor
-OUTPUT_FILE = "01_chess_svg.svg"
+OUTPUT_FILE = "chess_svg.svg"
 
 # Vytvořit pozici
 board = chess.Board()

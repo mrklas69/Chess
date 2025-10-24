@@ -5,7 +5,7 @@ import os
 import base64
 
 # Výstupní soubor
-OUTPUT_FILE = "02_xskak_latex.svg"
+OUTPUT_FILE = "xskak_latex.svg"
 
 # Vytvořit pozici
 board = chess.Board()
@@ -71,8 +71,14 @@ typewriter_style = '''
 # Vložit pattern a styly za první <defs> tag
 svg = svg.replace('<defs>', '<defs>' + hatching_pattern + typewriter_style, 1)
 
-# Zvětšit výšku SVG o 9px, aby se zobrazily všechny souřadnice
-svg = re.sub(r'height="400"', r'height="409"', svg)
+# Přidat bílé pozadí hned za <defs>...</defs>
+white_background = '<rect x="0" y="0" width="390" height="398" fill="#ffffff"/>\n'
+svg = svg.replace('</defs>', '</defs>' + white_background, 1)
+
+# Zvětšit výšku SVG o 8px, aby se zobrazily všechny souřadnice
+svg = re.sub(r'height="400"', r'height="408"', svg)
+# Upravit viewBox, aby odpovídal nové výšce
+svg = re.sub(r'viewBox="0 0 390 390"', r'viewBox="0 0 390 398"', svg)
 
 # Odstraníme všechny <g transform="translate(...)" fill="#000000" stroke="#000000">
 svg = re.sub(r'<g transform="translate\([^"]+\)" fill="#[0-9a-f]+" stroke="#[0-9a-f]+"><path d="[^"]+"\s*/></g>', '', svg)
@@ -82,7 +88,7 @@ files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 coordinates_svg = ''
 for i, letter in enumerate(files):
     x = 15 + i * 45 + 22.5  # margin + střed pole
-    y = 390
+    y = 391
     coordinates_svg += f'<text x="{x}" y="{y}" text-anchor="middle" class="coordinates">{letter}</text>\n'
 
 # Čísla 1-8 na levém okraji (x pozice vlevo od šachovnice)
