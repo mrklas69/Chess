@@ -20,7 +20,7 @@ cd 01_chess_svg
 python 01_chess_svg.py
 ```
 
-### 2. LaTeX xskak styl ([02_xskak_latex/02_xskak_latex.py](02_xskak_latex/02_xskak_latex.py))
+### 2. LaTeX xskak styl ([02_xskak_latex/xskak_latex.py](02_xskak_latex/xskak_latex.py))
 Replika stylu LaTeXového balíčku **xskak** - profesionální černobílý diagram se šrafováním tmavých polí.
 
 **Vlastnosti:**
@@ -28,13 +28,14 @@ Replika stylu LaTeXového balíčku **xskak** - profesionální černobílý dia
 - PNG figurky USCF (z adresáře `02_xskak_latex/uscf/`)
 - Černý rámeček kolem šachovnice
 - Typewriter font pro souřadnice (Source Code Pro / Courier)
-- Bílé pozadí
-- Výstup: `02_xskak_latex.svg`
+- Bílé pozadí pro celý obrázek
+- Optimalizovaný viewBox pro správné zobrazení ve VS Code i prohlížečích
+- Výstup: `xskak_latex.svg` (rozměry: 400×408px)
 
 **Spuštění:**
 ```bash
 cd 02_xskak_latex
-python 02_xskak_latex.py
+python xskak_latex.py
 ```
 
 ### 3. Leipzig styl ([03_leipzig/03_leipzig.py](03_leipzig/03_leipzig.py))
