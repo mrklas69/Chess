@@ -128,7 +128,7 @@ def generate_html_board():
 def main():
     html_content = generate_html_board()
     
-    output_file = "sachovy_diagram.html"
+    output_file = "leipzig.html"
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(html_content)
     
