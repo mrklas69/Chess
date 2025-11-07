@@ -127,7 +127,7 @@ def replace_pieces_with_images(svg_content, piece_images):
             x = 15 + file_idx * 45
             y = 15 + (7 - rank_idx) * 45
             piece_symbol = piece.symbol()
-            padding = 3
+            padding = 1
             if piece_symbol in piece_images:
                 pieces_svg += f'<image x="{x + padding}" y="{y + padding}" width="{45 - 2*padding}" height="{45 - 2*padding}" href="{piece_images[piece_symbol]}" />\n'
 
