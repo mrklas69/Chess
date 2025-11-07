@@ -5,7 +5,6 @@
 """
 
 import os
-import webbrowser
 
 def generate_html_board():
     # Mapování znaků Chess Leipzig
@@ -138,7 +137,7 @@ def main():
     print(f"Cesta: {abs_path}")
     
     try:
-        webbrowser.open('file://' + abs_path)
+        os.startfile(abs_path)
         print("🌐 Otevírám v prohlížeči...")
     except:
         print("Otevřete soubor ručně v prohlížeči.")
