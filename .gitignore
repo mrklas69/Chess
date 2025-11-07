@@ -1,5 +1,6 @@
 *.svg
 *.png
+*.html
 
 # Python cache
 __pycache__/

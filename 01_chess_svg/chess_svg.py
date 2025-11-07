@@ -5,16 +5,13 @@ import os
 # Výstupní soubor
 OUTPUT_FILE = "chess_svg.svg"
 
-# Vytvořit pozici
+# Vytvořit pozici základního postavení
 board = chess.Board()
-board.push_san("e4")
-board.push_san("e5")
-board.push_san("Nf3")
-board.push_san("Nc6")
-board.push_san("Bb5")
-board.push_san("a6")
 
-# Základní styl, jemně pozměněný
+# Výstup do konzole
+print(board)
+
+# Výstup do obrázku
 svg = chess.svg.board(
     board,
     size=400,
