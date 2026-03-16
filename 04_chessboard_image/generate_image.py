@@ -1,10 +1,44 @@
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning)
+"""
+Generování šachovnic v různých barevných tématech.
+Používá pouze python-chess (SVG výstup místo PNG).
+"""
 
-import chessboard_image as cbi
-sicilian_fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
-cbi.generate_image(sicilian_fen, "sicilian_defense_alpha.png", show_coordinates=True, size=400, theme_name="alpha")
-cbi.generate_image(sicilian_fen, "sicilian_defense_wikipedia.png", show_coordinates=True, size=400, theme_name="wikipedia")
-cbi.generate_image(sicilian_fen, "sicilian_defense_uscf.png", show_coordinates=True, size=400, theme_name="uscf")
-cbi.generate_image(sicilian_fen, "sicilian_defense_wisteria.png", show_coordinates=True, size=400, theme_name="wisteria")
-cbi.generate_image(sicilian_fen, "sicilian_defense_sakura.png", show_coordinates=True, size=400, theme_name="sakura")
+import chess
+import chess.svg
+import os
+
+# Sicilská obrana po 1.e4 c5
+SICILIAN_FEN = "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
+
+# Barevná témata: (světlé pole, tmavé pole)
+THEMES = {
+    "alpha":     ("#f0d9b5", "#b58863"),
+    "wikipedia": ("#FFCE9E", "#D18B47"),
+    "uscf":      ("#C3C6BE", "#727FA2"),
+    "wisteria":  ("#F5F0FF", "#967BB6"),
+    "sakura":    ("#FFFFFF", "#FFCAD8"),
+}
+
+board = chess.Board(SICILIAN_FEN)
+
+for theme_name, (light, dark) in THEMES.items():
+    # Vygenerování SVG s python-chess
+    svg = chess.svg.board(
+        board,
+        size=400,
+        coordinates=True,
+        colors={
+            "square light": light,
+            "square dark": dark,
+            "margin": light,
+            "coord": "#000000",
+        },
+    )
+
+    output_file = f"sicilian_defense_{theme_name}.svg"
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(svg)
+    print(f"Vytvořen: {output_file}")
+
+# Otevřít první soubor jako ukázku
+os.startfile(os.path.abspath("sicilian_defense_alpha.svg"))

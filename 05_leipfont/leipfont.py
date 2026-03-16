@@ -8,7 +8,7 @@ import os
 
 def generate_html_board():
     # Mapování znaků Chess Leipzig
-    pieces_position = "rnbqkbnr" + "pppppppp" + "........" + "........" + "........" + "........" + "PPPPPPPP" + "RNBQKBNR"
+    pieces_position = "rnbqkbnr" + "pppppppp" + "........" + "....b..." + "...B...." + "........" + "PPPPPPPP" + "RNBQKBNR"
     
     # Mapování znaků figur
     pieces_char = {
