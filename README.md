@@ -112,15 +112,16 @@ python leipfont.py
 
 ### 6. Hra proti Stockfish ([06_play/play.py](06_play/play.py))
 
-Interaktivní CLI hra proti enginu Stockfish s volbou jakéhokoli z předchozích pěti render stylů.
+Webový server s drag-and-drop ovládáním v prohlížeči. Hraje se proti Stockfishi, volitelný render styl z 01-05.
 
 **Vlastnosti:**
 
-- Tahy zadáváš v terminálu (SAN: `Nf3`, `O-O`; nebo UCI: `g1f3`, `e7e8q`)
-- Pozice se po každém tahu přegeneruje do `06_play/game.html` a prohlížeč ji automaticky refreshne (meta-refresh každé 2 s)
-- PGN tabulka tahů v terminálu (`1. e4 e5  2. Nf3 Nc6 ...`)
-- Volitelný render styl 1-5, volitelná barva (W/B), úroveň Stockfish 0-20
-- Příkazy `quit` / `resign` během hry
+- Lokální HTTP server (stdlib `http.server`, bez Flask) na `http://localhost:8000`
+- Setup formulář: styl šachovnice (1-5), téma pro styl 4, barva (W/B), Stockfish skill 0-20
+- Drag-and-drop figurek (vanilla JS, bez externích knihoven) — funguje pro styly 01-04 (SVG)
+- Pro styl 05 (font HTML) i jako fallback je text input (SAN `Nf3` nebo UCI `e2e4`)
+- Sidebar: status (čí tah, šach, mat), PGN tabulka tahů, tlačítko Nová hra
+- Auto-promotion na dámu při tahu pěšce do poslední řady (drag UI neumí dialog)
 
 **Spuštění:**
 
@@ -128,7 +129,7 @@ Interaktivní CLI hra proti enginu Stockfish s volbou jakéhokoli z předchozíc
 python 06_play/play.py
 ```
 
-(spouštět z kořene repa)
+Server sám otevře prohlížeč. Ctrl+C ukončí.
 
 ## Požadavky
 
