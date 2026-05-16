@@ -34,9 +34,11 @@ def generate_html_board():
     corner_bottom_left = 0x37
     corner_bottom_right = 0x39
     
-    # Souřadnice polí (a-h, 1-8) - obsahují již border
-    files_with_top_border = [x for x in range(0xC8, 0xD0)] # a-h
-    rows_with_right_border = [x for x in range(0xC0, 0xC8)] # 1-8
+    # Souřadnice polí (a-h, 1-8). Font má každý znak s borderem na jedné straně,
+    # který tvoří hranu desky — proto písmenka a-h mají horní border (umisťují se DOLŮ
+    # pod desku) a čísla 1-8 mají pravý border (umisťují se VLEVO od desky).
+    bottom_edge_files = [x for x in range(0xC8, 0xD0)] # a-h s horním borderem
+    left_edge_ranks = [x for x in range(0xC0, 0xC8)]   # 1-8 s pravým borderem
     
     # Vytvoření HTML
     html = """<!DOCTYPE html>
@@ -88,13 +90,13 @@ def generate_html_board():
         html += chr(border_horizontal)
     html += chr(corner_top_right) + "\n"
     
-    # Generování šachovnice s čísly řad vlevo (již obsahují levý border)
+    # Generování šachovnice s čísly řad vlevo
     idx = 0
     for row in range(8):
         rank = 8 - row  # 8, 7, 6, ..., 1
-        
-        # Číslo řady (obsahuje levý border)
-        html += chr(rows_with_right_border[rank - 1])
+
+        # Číslo řady na levém okraji desky (znak má pravý border = hranu desky)
+        html += chr(left_edge_ranks[rank - 1])
         
         # Pole šachovnice
         for col in range(8):
@@ -110,9 +112,9 @@ def generate_html_board():
         html += chr(border_vertical)
         html += "\n"
     
-    # Dolní okraj
+    # Dolní okraj — písmenka a-h, jejich horní border tvoří dolní hranu desky
     html += chr(corner_bottom_left)
-    for file_char in files_with_top_border:
+    for file_char in bottom_edge_files:
         html += chr(file_char)
     html += chr(corner_bottom_right) + "\n"
     
