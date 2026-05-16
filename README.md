@@ -1,10 +1,10 @@
 # Chess
 
-Šachové experimenty - generování šachových diagramů různými technikami v Pythonu.
+Šachové experimenty - generování šachových diagramů různými technikami v Pythonu + interaktivní hra proti Stockfish.
 
 ## Přehled řešení
 
-Projekt obsahuje pět Python skriptů, každý demonstruje jiný přístup k vizualizaci šachové pozice:
+Projekt obsahuje pět Python skriptů demonstrujících různé techniky vizualizace, plus interaktivní hru, která je všechny využívá:
 
 | #  | Řešení           | Technologie                 | Výstup | Pozice                                      | Figurky                  |
 | -- | ---------------- | --------------------------- | ------ | ------------------------------------------- | ------------------------ |
@@ -13,6 +13,7 @@ Projekt obsahuje pět Python skriptů, každý demonstruje jiný přístup k viz
 | 03 | leipzig          | `python-chess` + úpravy SVG | SVG    | Ruy Lopez (1.e4 e5 2.Jf3 Jc6 3.Ss5 a6)    | PNG (Leipzig sada)       |
 | 04 | chessboard_image | `python-chess` SVG          | SVG    | Sicilská obrana (1.e4 c5)                   | 5 barevných témat        |
 | 05 | leipfont         | Čistý Python (bez knihoven) | HTML   | Italská hra (1.e4 e5 2.Jf3 Jc6 3.Sc4 Sc5) | Font Chess Leipzig (TTF) |
+| 06 | play             | `python-chess` UCI klient   | HTML   | Interaktivní hra proti Stockfish            | Volitelně všech 5 stylů  |
 
 ### 1. Základní chess.svg ([01_chess_svg/chess_svg.py](01_chess_svg/chess_svg.py))
 
@@ -109,13 +110,35 @@ cd 05_leipfont
 python leipfont.py
 ```
 
+### 6. Hra proti Stockfish ([06_play/play.py](06_play/play.py))
+
+Interaktivní CLI hra proti enginu Stockfish s volbou jakéhokoli z předchozích pěti render stylů.
+
+**Vlastnosti:**
+
+- Tahy zadáváš v terminálu (SAN: `Nf3`, `O-O`; nebo UCI: `g1f3`, `e7e8q`)
+- Pozice se po každém tahu přegeneruje do `06_play/game.html` a prohlížeč ji automaticky refreshne (meta-refresh každé 2 s)
+- PGN tabulka tahů v terminálu (`1. e4 e5  2. Nf3 Nc6 ...`)
+- Volitelný render styl 1-5, volitelná barva (W/B), úroveň Stockfish 0-20
+- Příkazy `quit` / `resign` během hry
+
+**Spuštění:**
+
+```bash
+python 06_play/play.py
+```
+
+(spouštět z kořene repa)
+
 ## Požadavky
 
 ```bash
-pip install python-chess        # pro řešení 01, 02, 03, 04
+pip install python-chess        # pro řešení 01, 02, 03, 04, 06
 ```
 
 Řešení 05 vyžaduje nainstalovaný font **Chess Leipzig** (LEIPFONT.TTF) ve Windows.
+
+Řešení 06 vyžaduje **Stockfish** v PATH — stáhni z <https://stockfishchess.org/download/>.
 
 ## Poznámka k výstupním souborům
 
