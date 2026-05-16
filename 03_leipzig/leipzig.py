@@ -30,10 +30,11 @@ piece_mapping = {
     'p': 'bP.png', 'n': 'bN.png', 'b': 'bB.png', 'r': 'bR.png', 'q': 'bQ.png', 'k': 'bK.png'
 }
 
+# Operujeme přímo bez os.path.exists kontroly — když figurka chybí,
+# chceme rovnou FileNotFoundError (jinak by skript tiše vyrobil rozbitý SVG).
 for piece_symbol, filename in piece_mapping.items():
     piece_path = os.path.join(piece_dir, filename)
-    if os.path.exists(piece_path):
-        piece_images[piece_symbol] = load_piece_image(piece_path)
+    piece_images[piece_symbol] = load_piece_image(piece_path)
 
 # Základní styl s bílými poli (zapneme souřadnice, pak je nahradíme šrafováním)
 svg = chess.svg.board(
@@ -49,9 +50,8 @@ svg = chess.svg.board(
 
 # Nahradit vektorové figurky PNG obrázky
 def replace_pieces_with_images(svg_content, piece_images):
-    # Odstranit všechny <use> elementy, které odkazují na figurky
-    svg_content = re.sub(r'<use[^>]*href="#[^"]*"[^>]*transform="translate\([^)]*\)"[^/]*/>', '', svg_content)
-    svg_content = re.sub(r'<use[^>]*transform="translate\([^)]*\)"[^>]*href="#[^"]*"[^/]*/>', '', svg_content)
+    # Odstranit všechny <use> elementy (figurky) bez ohledu na pořadí atributů
+    svg_content = re.sub(r'<use\b[^/]*?/>', '', svg_content)
 
     # Přidat nové <image> elementy pro figurky před </svg>
     pieces_svg = ''

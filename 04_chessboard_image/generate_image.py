@@ -21,6 +21,10 @@ THEMES = {
 
 board = chess.Board(SICILIAN_FEN)
 
+# Uložíme si název prvního souboru, ať na konci nemusíme duplikovat znalost
+# o tom, jaký klíč je první v THEMES (dict v Pythonu 3.7+ drží pořadí vložení).
+first_output = None
+
 for theme_name, (light, dark) in THEMES.items():
     # Vygenerování SVG s python-chess
     svg = chess.svg.board(
@@ -40,5 +44,8 @@ for theme_name, (light, dark) in THEMES.items():
         f.write(svg)
     print(f"Vytvořen: {output_file}")
 
-# Otevřít první soubor jako ukázku
-os.startfile(os.path.abspath("sicilian_defense_alpha.svg"))
+    if first_output is None:
+        first_output = output_file
+
+# Otevřít první vygenerovaný soubor jako ukázku
+os.startfile(os.path.abspath(first_output))

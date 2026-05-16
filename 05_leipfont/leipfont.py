@@ -132,14 +132,16 @@ def main():
         f.write(html_content)
     
     abs_path = os.path.abspath(output_file)
-    
-    print(f"✅ HTML soubor vytvořen: {output_file}")
+
+    print(f"HTML soubor vytvořen: {output_file}")
     print(f"Cesta: {abs_path}")
-    
+
+    # Zúžený except — bare except by spolkl i KeyboardInterrupt/SystemExit.
+    # os.startfile vyhazuje OSError (typicky když není asociovaný prohlížeč).
     try:
         os.startfile(abs_path)
-        print("🌐 Otevírám v prohlížeči...")
-    except:
+        print("Otevírám v prohlížeči...")
+    except OSError:
         print("Otevřete soubor ručně v prohlížeči.")
 
 
