@@ -120,7 +120,7 @@ Webový server s drag-and-drop ovládáním v prohlížeči. Hraje se proti Stoc
 - Setup formulář: styl šachovnice (1-5), téma pro styl 4, barva (W/B), Stockfish skill 0-20
 - Drag-and-drop figurek (vanilla JS, bez externích knihoven) — funguje pro styly 01-04 (SVG)
 - Pro styl 05 (font HTML) i jako fallback je text input (SAN `Nf3` nebo UCI `e2e4`)
-- Sidebar: status (čí tah, šach, mat), PGN tabulka tahů, tlačítko Nová hra
+- Sidebar: status (čí tah, šach, mat), PGN tabulka tahů, tlačítka Stáhnout PGN / Vzdát se / Nová hra
 - Auto-promotion na dámu při tahu pěšce do poslední řady (drag UI neumí dialog)
 
 **Spuštění:**

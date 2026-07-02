@@ -11,6 +11,7 @@ Vyžaduje:
 Server běží na http://localhost:8000 a sám otevře prohlížeč.
 Ctrl+C ukončí.
 """
+import datetime
 import http.server
 import json
 import os
@@ -31,6 +32,10 @@ from renderers import RENDERERS, THEMES_04, render_04  # noqa: E402
 
 PORT = 8000
 ENGINE_THINK_TIME = 0.5  # sekundy přemýšlení Stockfish na tah
+
+# Font pro styl 5 — servírujeme ho z HTTP, protože prohlížeč blokuje
+# načítání file:/// zdrojů ze stránky doručené přes http://
+LEIPFONT_PATH = Path('C:/Windows/Fonts/LEIPFONT.TTF')
 
 
 # === Globální stav hry =======================================================
@@ -92,6 +97,32 @@ def pgn_text(state: GameState) -> str:
     text = game.accept(exp).strip()
     # '*' je PGN značka "nedokončeno" — pro rozjetou hru rušivá, oříznem
     return text.rstrip(' *').rstrip()
+
+
+def _pgn_result(state: GameState) -> str:
+    """Spočítá PGN výsledek: '1-0', '0-1', '1/2-1/2' nebo '*' (nedokončeno)."""
+    # Resign: vyhrává soupeř (z perspektivy hráče)
+    if state.resigned:
+        return "0-1" if state.player_color == chess.WHITE else "1-0"
+    outcome = state.board.outcome()
+    return outcome.result() if outcome else "*"
+
+
+def pgn_full(state: GameState) -> str:
+    """Kompletní PGN se Seven Tag Roster — pro stažení partie ze sidebaru.
+    Tahy bere stejně jako pgn_text, ale přidává hlavičky a výsledek."""
+    game = chess.pgn.Game.from_board(state.board)
+    player_white = state.player_color == chess.WHITE
+    # Seven Tag Roster v pořadí předepsaném PGN standardem
+    game.headers["Event"] = "Casual Game"
+    game.headers["Site"] = "localhost"
+    game.headers["Date"] = datetime.date.today().strftime("%Y.%m.%d")
+    game.headers["Round"] = "-"
+    game.headers["White"] = "Player" if player_white else f"Stockfish (skill {state.skill})"
+    game.headers["Black"] = f"Stockfish (skill {state.skill})" if player_white else "Player"
+    game.headers["Result"] = _pgn_result(state)
+    exp = chess.pgn.StringExporter(headers=True, comments=False, variations=False)
+    return game.accept(exp)
 
 
 # === HTML šablony ============================================================
@@ -258,6 +289,27 @@ function dragEnd(e) {
     }
 }
 
+// Vzdání hry — POST /api/resign po potvrzení. Po úspěchu disable tlačítka,
+// ať uživatel nemůže vzdát podruhé (backend by stejně vrátil error).
+async function resignGame() {
+    if (uiLocked) return;
+    if (!confirm('Opravdu vzdát partii?')) return;
+    uiLocked = true;
+    try {
+        const r = await fetch('/api/resign', {method: 'POST'});
+        const data = await r.json();
+        if (!data.ok) {
+            alert('Nelze vzdát: ' + (data.error || '?'));
+            return;
+        }
+        document.getElementById('status').textContent = data.status;
+        document.getElementById('pgn').textContent = data.pgn;
+        document.getElementById('resign-btn').disabled = true;
+    } finally {
+        uiLocked = false;
+    }
+}
+
 attachDragHandlers();
 '''
 
@@ -313,18 +365,32 @@ def render_game_page(state: GameState) -> str:
         }}
         form {{ margin-bottom: 10px; display: flex; gap: 5px; }}
         input[type="text"] {{ flex: 1; padding: 8px; font-size: 14px; }}
-        button {{ padding: 8px 15px; cursor: pointer; }}
-        .new-game {{
+        form button {{ padding: 8px 15px; cursor: pointer; }}
+        /* Sdílený styl pro akční tlačítka v dolní části sidebaru.
+           Funguje pro <a> i <button> — proto reset border/font. */
+        .action {{
             display: block;
+            box-sizing: border-box;
+            width: 100%;
             text-align: center;
             padding: 10px;
-            background: #f44336;
+            margin-bottom: 8px;
             color: white;
             text-decoration: none;
+            border: 0;
             border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
             font-weight: bold;
+            cursor: pointer;
         }}
-        .new-game:hover {{ background: #d32f2f; }}
+        .action.download {{ background: #2196F3; }}
+        .action.download:hover {{ background: #1976D2; }}
+        .action.resign {{ background: #ff9800; }}
+        .action.resign:hover {{ background: #f57c00; }}
+        .action.resign:disabled {{ background: #ccc; cursor: not-allowed; }}
+        .action.new-game {{ background: #f44336; }}
+        .action.new-game:hover {{ background: #d32f2f; }}
         #board svg image {{ cursor: grab; }}
     </style>
 </head>
@@ -337,7 +403,9 @@ def render_game_page(state: GameState) -> str:
             <button type="submit">Tah</button>
         </form>
         <div class="pgn" id="pgn">{pgn_text(state)}</div>
-        <a class="new-game" href="/">Nová hra</a>
+        <a class="action download" href="/api/pgn" download="game.pgn">Stáhnout PGN</a>
+        <button class="action resign" id="resign-btn" onclick="resignGame()">Vzdát se</button>
+        <a class="action new-game" href="/">Nová hra</a>
     </div>
     <script>{DRAG_JS}</script>
 </body>
@@ -382,6 +450,29 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     self._redirect('/')
                     return
                 self._send(200, render_game_page(_state))
+        elif self.path == '/leipfont.ttf':
+            # Font pro styl 5; read_bytes vyhodí FileNotFoundError → 404
+            try:
+                data = LEIPFONT_PATH.read_bytes()
+            except FileNotFoundError:
+                self._send(404, b'font not found', 'text/plain')
+                return
+            self._send(200, data, 'font/ttf')
+        elif self.path == '/api/pgn':
+            # Stažení partie. Funguje i pro rozjetou hru (Result="*") i po
+            # skončení/rezignaci. Content-Disposition donutí browser stáhnout
+            # soubor místo zobrazení.
+            with _state.lock:
+                if _state.engine is None:
+                    self._send(404, b'no game', 'text/plain')
+                    return
+                pgn_bytes = pgn_full(_state).encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/x-chess-pgn; charset=utf-8')
+            self.send_header('Content-Disposition', 'attachment; filename="game.pgn"')
+            self.send_header('Content-Length', str(len(pgn_bytes)))
+            self.end_headers()
+            self.wfile.write(pgn_bytes)
         else:
             self._send(404, '<h1>404</h1>')
 
@@ -396,6 +487,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == '/api/move':
             payload = json.loads(body) if body else {}
             self._handle_move(payload)
+        elif self.path == '/api/resign':
+            self._handle_resign()
         else:
             self._send(404, '<h1>404</h1>')
 
@@ -471,6 +564,23 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 'pgn': pgn_text(_state),
                 'status': status_text(_state),
                 'game_over': _state.board.is_game_over(),
+            })
+
+    def _handle_resign(self) -> None:
+        """Hráč vzdává partii — nastaví flag, vrátí update JSON jako /api/move."""
+        with _state.lock:
+            if _state.engine is None:
+                self._json({'ok': False, 'error': 'Není rozjetá hra'})
+                return
+            if _state.board.is_game_over() or _state.resigned:
+                self._json({'ok': False, 'error': 'Hra už skončila'})
+                return
+            _state.resigned = True
+            self._json({
+                'ok': True,
+                'pgn': pgn_text(_state),
+                'status': status_text(_state),
+                'game_over': True,
             })
 
     def _engine_move(self) -> None:

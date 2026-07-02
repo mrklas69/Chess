@@ -255,12 +255,14 @@ def render_05(board: chess.Board) -> str:
     lines.append(chr(corner_bl) + ''.join(chr(c) for c in bottom_edge_files) + chr(corner_br))
     board_str = '\n'.join(lines)
 
-    # HTML fragment s vloženým @font-face (style v body je platný HTML5)
+    # HTML fragment s vloženým @font-face (style v body je platný HTML5).
+    # URL '/leipfont.ttf' servíruje play.py — file:/// scheme z http:// origin
+    # je v moderních prohlížečích blokovaný (cross-scheme).
     return f'''<style>
 @font-face {{
     font-family: 'ChessLeipzig';
     src: local('LEIPFONT'),
-         url('file:///C:/Windows/Fonts/LEIPFONT.TTF') format('truetype');
+         url('/leipfont.ttf') format('truetype');
 }}
 .board-leipfont {{
     font-family: 'ChessLeipzig', monospace;
